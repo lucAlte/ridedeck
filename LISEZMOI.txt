@@ -31,7 +31,7 @@ Sans clés dans config.js, tout fonctionne en "mode local" (sans compte, donnée
 
 ÉTAPE 3 — Mettre en ligne sur GitHub Pages
   1. github.com > + > New repository > nom "ridedeck" > Public > Create.
-  2. "uploading an existing file" > glisse TOUT le contenu du dossier (fichiers + dossier assets) > Commit changes.
+  2. "uploading an existing file" > glisse TOUT le contenu du dossier > Commit changes.
   3. Settings > Pages > Source : Deploy from a branch > main / (root) > Save.
   4. Après 1-2 min : https://TON-PSEUDO.github.io/ridedeck/
 
