@@ -1,0 +1,55 @@
+﻿RIDEDECK — MISE EN LIGNE (environ 20 minutes)
+==============================================
+
+CONTENU DU DOSSIER
+  index.html            Site de présentation
+  login.html            Connexion (+ mot de passe oublié)
+  signup.html           Création de compte
+  app.html              Le programme RideDeck (réservé aux comptes connectés)
+  config.js             Les 2 clés Supabase à renseigner (étape 2)
+  cloud.js, site.css    Fichiers communs
+  assets/               Images et icône
+  supabase-setup.sql    Tables + règles de sécurité (étape 1)
+
+Sans clés dans config.js, tout fonctionne en "mode local" (sans compte, données sur l'appareil).
+
+
+ÉTAPE 1 — Créer la base Supabase (gratuit)
+  1. https://supabase.com > Start your project > connexion avec GitHub.
+  2. New project : nom "ridedeck", un mot de passe de base (garde-le), région "West EU (Paris)" ou "Central EU (Frankfurt)". Create.
+  3. Attends ~2 min. Menu de gauche > SQL Editor > New query.
+     Colle tout le contenu de supabase-setup.sql > Run. Message attendu : "Success. No rows returned".
+
+ÉTAPE 2 — Brancher le site sur Supabase
+  1. Supabase > Project Settings (roue dentée) > API (ou "Data API" / "API Keys").
+  2. Copie "Project URL" et la clé "anon public" (onglet "Legacy API Keys" si Supabase affiche d'abord
+     une clé "publishable" : prends la clé anon qui commence par eyJ).
+  3. Ouvre config.js avec le Bloc-notes et colle-les entre les guillemets :
+       supabaseUrl: 'https://xxxxxxxx.supabase.co',
+       supabaseAnonKey: 'eyJhbGciOi...'
+     La clé "anon" est faite pour être publique. NE METS JAMAIS la clé "service_role" dans ce fichier.
+
+ÉTAPE 3 — Mettre en ligne sur GitHub Pages
+  1. github.com > + > New repository > nom "ridedeck" > Public > Create.
+  2. "uploading an existing file" > glisse TOUT le contenu du dossier (fichiers + dossier assets) > Commit changes.
+  3. Settings > Pages > Source : Deploy from a branch > main / (root) > Save.
+  4. Après 1-2 min : https://TON-PSEUDO.github.io/ridedeck/
+
+ÉTAPE 4 — Autoriser ton adresse dans Supabase (sinon les liens des emails ne marchent pas)
+  Supabase > Authentication > URL Configuration :
+    Site URL       : https://TON-PSEUDO.github.io/ridedeck/
+    Redirect URLs  : ajoute https://TON-PSEUDO.github.io/ridedeck/**
+  Save.
+
+ÉTAPE 5 — Tester
+  Ouvre le site > Créer un compte > clique le lien reçu par email > connecte-toi.
+  Sur l'iPad : ouvre la même adresse dans Bluefy et connecte-toi avec le même compte.
+
+OPTIONNEL
+  - Pas envie de confirmer l'email à l'inscription : Authentication > Sign In / Providers > Email > décoche "Confirm email".
+  - Les emails Supabase gratuits sont limités (quelques-uns par heure) : suffisant pour toi, pas pour un lancement public.
+    Pour plus : Authentication > Emails > SMTP Settings (Brevo, Resend… gratuits).
+  - Projet gratuit Supabase : mis en pause après 7 jours sans aucune activité. Il se relance en un clic depuis le tableau de bord.
+
+METTRE À JOUR LE SITE
+  GitHub > ton dépôt > Add file > Upload files > glisse les fichiers modifiés > Commit. En ligne en 1-2 min.

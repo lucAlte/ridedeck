@@ -1,0 +1,89 @@
+/* RideDeck — styles communs du site (accueil, connexion, inscription) */
+:root{
+  --bg:#07090c; --bg2:#0b0f14; --panel:#10151c; --panel2:#151c25; --line:#1f2834; --line2:#2b3644;
+  --text:#eef2f7; --muted:#8a99ab; --dim:#556374;
+  --accent:#c6ff3a; --cyan:#3cc8ff; --hr:#ff4d6d; --power:#ffc83d; --ok:#3ddc84; --err:#ff5c6c;
+  --num:'Barlow Condensed','Bahnschrift','Arial Narrow',system-ui,sans-serif;
+  --ui:'Barlow','Segoe UI',system-ui,sans-serif;
+  --r:18px; --wrap:1240px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--ui);font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;height:auto;display:block}
+h1,h2,h3{margin:0;line-height:1.05}
+p{margin:0}
+button,input{font:inherit;color:inherit}
+.wrap{width:min(var(--wrap),100% - 40px);margin-inline:auto}
+.muted{color:var(--muted)}
+
+/* Boutons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.55em;height:48px;padding:0 22px;border-radius:12px;font-weight:600;font-size:16px;border:1px solid var(--line2);background:#141b23;cursor:pointer;transition:transform .15s,background .15s,border-color .15s,box-shadow .2s;white-space:nowrap}
+.btn:hover{background:#1b242f;border-color:#3a4757}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#0a0d10;box-shadow:0 0 0 0 rgba(198,255,58,0)}
+.btn.primary:hover{box-shadow:0 10px 40px -8px rgba(198,255,58,.55);background:#d2ff5c}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{background:rgba(255,255,255,.05)}
+.btn.lg{height:58px;padding:0 30px;font-size:18px;border-radius:14px}
+.btn.sm{height:40px;padding:0 16px;font-size:15px;border-radius:10px}
+.btn[disabled]{opacity:.55;cursor:wait}
+.btn .arr{transition:transform .2s}
+.btn:hover .arr{transform:translateX(3px)}
+
+/* Logo */
+.logo{display:inline-flex;align-items:center;gap:10px;font-family:var(--num);font-weight:700;font-size:26px;letter-spacing:.06em}
+.logo i{width:26px;height:26px;background:linear-gradient(135deg,var(--accent),var(--cyan));clip-path:polygon(0 100%,100% 0,100% 100%)}
+
+/* Formulaires (connexion / inscription) */
+.auth{min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.auth-side{position:relative;overflow:hidden;padding:44px 56px;display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(900px 600px at 20% 10%,rgba(60,200,255,.16),transparent 60%),radial-gradient(800px 600px at 90% 90%,rgba(198,255,58,.14),transparent 60%),var(--bg2);border-right:1px solid var(--line)}
+.auth-side h2{font-family:var(--num);font-size:clamp(40px,4.4vw,68px);text-transform:uppercase;letter-spacing:.01em;line-height:.95;margin-bottom:18px}
+.auth-side h2 em{font-style:normal;color:var(--accent)}
+.auth-side p{color:var(--muted);font-size:18px;max-width:460px}
+.auth-shot{margin:34px 0;border-radius:16px;border:1px solid var(--line2);box-shadow:0 40px 90px -30px rgba(0,0,0,.8);transform:perspective(1400px) rotateY(-9deg) rotateX(3deg);transform-origin:left center;max-width:640px}
+.auth-quote{display:flex;gap:28px;color:var(--muted);font-size:14px;flex-wrap:wrap}
+.auth-quote b{display:block;font-family:var(--num);font-size:30px;color:var(--text);line-height:1}
+.auth-main{display:flex;flex-direction:column;padding:32px clamp(20px,5vw,72px)}
+.auth-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.auth-top .logo{visibility:hidden}
+.auth-card{width:100%;max-width:440px;margin:auto;padding:40px 0}
+.auth-card h1{font-size:38px;letter-spacing:-.01em;margin-bottom:10px}
+.auth-card .lead{color:var(--muted);margin-bottom:30px}
+.field{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.field label{font-size:14px;font-weight:600;color:#c8d2de;display:flex;justify-content:space-between;align-items:baseline}
+.field label a{font-weight:500;color:var(--cyan)}
+.input{position:relative}
+.input input{width:100%;height:54px;border-radius:12px;border:1px solid var(--line2);background:#0b1015;padding:0 16px;font-size:16px;outline:none;transition:border-color .15s,box-shadow .15s}
+.input input:focus{border-color:var(--accent);box-shadow:0 0 0 4px rgba(198,255,58,.12)}
+.input input::placeholder{color:#4d5a69}
+.input .eye{position:absolute;right:8px;top:8px;height:38px;padding:0 10px;border:0;background:none;color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;border-radius:8px}
+.input .eye:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.meter{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px}
+.meter i{height:4px;border-radius:4px;background:#1f2834;transition:background .2s}
+.hint{font-size:13px;color:var(--muted)}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--muted);margin:4px 0 22px;cursor:pointer}
+.check input{margin-top:3px;accent-color:var(--accent);width:16px;height:16px;flex:none}
+.check a{color:var(--text);text-decoration:underline;text-underline-offset:3px}
+.form-btn{width:100%}
+.alt{text-align:center;margin-top:22px;color:var(--muted);font-size:15px}
+.alt a{color:var(--accent);font-weight:600}
+.msg{display:none;padding:14px 16px;border-radius:12px;font-size:15px;margin-bottom:18px;line-height:1.45}
+.msg.show{display:block}
+.msg.err{background:rgba(255,92,108,.1);border:1px solid rgba(255,92,108,.35);color:#ffb3bb}
+.msg.ok{background:rgba(61,220,132,.1);border:1px solid rgba(61,220,132,.35);color:#a7f0c8}
+.msg.info{background:rgba(60,200,255,.08);border:1px solid rgba(60,200,255,.3);color:#b4e8ff}
+.sent{text-align:center}
+.sent .ic{width:76px;height:76px;border-radius:50%;margin:0 auto 22px;display:grid;place-items:center;font-size:34px;background:rgba(198,255,58,.12);color:var(--accent);border:1px solid rgba(198,255,58,.35)}
+.sent h1{margin-bottom:12px}
+.sent p{color:var(--muted);margin-bottom:26px}
+.sent p b{color:var(--text)}
+.spin{width:18px;height:18px;border-radius:50%;border:2px solid rgba(10,13,16,.3);border-top-color:#0a0d10;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+@media (max-width: 960px){
+  .auth{grid-template-columns:1fr}
+  .auth-side{display:none}
+  .auth-top .logo{visibility:visible}
+}

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Connexion · RideDeck</title>
+<meta name="description" content="Connecte-toi à RideDeck pour retrouver tes entraînements et ton historique sur tous tes appareils.">
+<meta name="theme-color" content="#07090c">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="cloud.js"></script>
+<script>
+  // Déjà connecté (et pas en train de réinitialiser son mot de passe) : direction l'app
+  if (window.RD && RD.configured && RD.cachedUser() && !/type=recovery/.test(location.hash) && !/reset=1/.test(location.search)) location.replace('app.html');
+</script>
+</head>
+<body>
+<div class="auth">
+  <aside class="auth-side">
+    <a class="logo" href="index.html"><i></i>RIDEDECK</a>
+    <div>
+      <h2>Content de te<br><em>revoir.</em></h2>
+      <p>Ton historique, tes parcours et tes réglages t'attendent, sur PC comme sur iPad.</p>
+      <img class="auth-shot" src="assets/app-wide.jpg" alt="Écran de séance RideDeck" width="1600" height="670">
+    </div>
+    <div class="auth-quote">
+      <div><b>7</b>niveaux pilotés</div>
+      <div><b>10 s</b>d'anticipation</div>
+      <div><b>∞</b>appareils synchronisés</div>
+    </div>
+  </aside>
+
+  <main class="auth-main">
+    <div class="auth-top">
+      <a class="logo" href="index.html"><i></i>RIDEDECK</a>
+      <a class="btn sm ghost" href="index.html">← Accueil</a>
+    </div>
+
+    <!-- Connexion -->
+    <section class="auth-card" id="v-login">
+      <h1>Connexion</h1>
+      <p class="lead">Accède à ton espace d'entraînement.</p>
+      <div class="msg" id="m-login"></div>
+      <form id="f-login" novalidate>
+        <div class="field"><label for="l-email">Email</label><div class="input"><input id="l-email" type="email" autocomplete="email" placeholder="toi@exemple.fr" required></div></div>
+        <div class="field"><label for="l-pass">Mot de passe <a href="#" id="to-forgot">Mot de passe oublié ?</a></label><div class="input"><input id="l-pass" type="password" autocomplete="current-password" placeholder="••••••••" required><button type="button" class="eye" data-eye="l-pass">Afficher</button></div></div>
+        <button class="btn primary lg form-btn" type="submit" id="b-login">Se connecter <span class="arr">→</span></button>
+      </form>
+      <p class="alt">Pas encore de compte ? <a href="signup.html">Créer un compte</a></p>
+    </section>
+
+    <!-- Mot de passe oublié -->
+    <section class="auth-card" id="v-forgot" hidden>
+      <h1>Mot de passe oublié</h1>
+      <p class="lead">Indique ton email : tu recevras un lien pour choisir un nouveau mot de passe.</p>
+      <div class="msg" id="m-forgot"></div>
+      <form id="f-forgot" novalidate>
+        <div class="field"><label for="f-email">Email</label><div class="input"><input id="f-email" type="email" autocomplete="email" placeholder="toi@exemple.fr" required></div></div>
+        <button class="btn primary lg form-btn" type="submit" id="b-forgot">Envoyer le lien <span class="arr">→</span></button>
+      </form>
+      <p class="alt"><a href="#" id="to-login">← Retour à la connexion</a></p>
+    </section>
+
+    <!-- Nouveau mot de passe -->
+    <section class="auth-card" id="v-reset" hidden>
+      <h1>Nouveau mot de passe</h1>
+      <p class="lead">Choisis un mot de passe d'au moins 8 caractères.</p>
+      <div class="msg" id="m-reset"></div>
+      <form id="f-reset" novalidate>
+        <div class="field"><label for="r-pass">Nouveau mot de passe</label><div class="input"><input id="r-pass" type="password" autocomplete="new-password" minlength="8" placeholder="8 caractères minimum" required><button type="button" class="eye" data-eye="r-pass">Afficher</button></div></div>
+        <button class="btn primary lg form-btn" type="submit" id="b-reset">Enregistrer et continuer <span class="arr">→</span></button>
+      </form>
+    </section>
+  </main>
+</div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+function show(v) { ['login', 'forgot', 'reset'].forEach(k => $('#v-' + k).hidden = k !== v); }
+function msg(id, text, kind) { const el = $('#m-' + id); el.textContent = text; el.className = 'msg show ' + kind; }
+function busy(btn, on, label) { btn.disabled = on; if (on) { btn.dataset.l = btn.innerHTML; btn.innerHTML = '<span class="spin"></span>' + label; } else if (btn.dataset.l) btn.innerHTML = btn.dataset.l; }
+document.querySelectorAll('[data-eye]').forEach(b => b.onclick = () => { const i = document.getElementById(b.dataset.eye); i.type = i.type === 'password' ? 'text' : 'password'; b.textContent = i.type === 'password' ? 'Afficher' : 'Masquer'; });
+$('#to-forgot').onclick = e => { e.preventDefault(); $('#f-email').value = $('#l-email').value; show('forgot'); };
+$('#to-login').onclick = e => { e.preventDefault(); show('login'); };
+const okEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+if (!RD.configured || !RD.client) {
+  msg('login', 'Les comptes ne sont pas encore activés sur ce site (config.js vide). Tu peux utiliser RideDeck en mode local, sur cet appareil uniquement.', 'info');
+  $('#f-login').innerHTML = '<a class="btn primary lg form-btn" href="app.html">Ouvrir RideDeck en mode local <span class="arr">→</span></a>';
+} else {
+  const q = new URLSearchParams(location.search);
+  if (q.get('confirmed')) msg('login', 'Email confirmé. Tu peux te connecter.', 'ok');
+  if (q.get('reset') || /type=recovery/.test(location.hash)) show('reset');
+  RD.client.auth.onAuthStateChange(ev => { if (ev === 'PASSWORD_RECOVERY') show('reset'); });
+
+  $('#f-login').onsubmit = async e => {
+    e.preventDefault();
+    const email = $('#l-email').value.trim(), password = $('#l-pass').value;
+    if (!okEmail(email)) return msg('login', 'Adresse email invalide.', 'err');
+    if (!password) return msg('login', 'Saisis ton mot de passe.', 'err');
+    const b = $('#b-login'); busy(b, true, 'Connexion…');
+    const { error } = await RD.client.auth.signInWithPassword({ email, password });
+    if (error) { busy(b, false); return msg('login', RD.frError(error), 'err'); }
+    location.replace('app.html');
+  };
+  $('#f-forgot').onsubmit = async e => {
+    e.preventDefault();
+    const email = $('#f-email').value.trim();
+    if (!okEmail(email)) return msg('forgot', 'Adresse email invalide.', 'err');
+    const b = $('#b-forgot'); busy(b, true, 'Envoi…');
+    const { error } = await RD.client.auth.resetPasswordForEmail(email, { redirectTo: RD.url('login.html?reset=1') });
+    busy(b, false);
+    if (error) return msg('forgot', RD.frError(error), 'err');
+    msg('forgot', 'Si un compte existe pour cette adresse, un lien vient d’être envoyé. Pense à vérifier tes spams.', 'ok');
+  };
+  $('#f-reset').onsubmit = async e => {
+    e.preventDefault();
+    const password = $('#r-pass').value;
+    if (password.length < 8) return msg('reset', 'Mot de passe trop court : 8 caractères minimum.', 'err');
+    const b = $('#b-reset'); busy(b, true, 'Enregistrement…');
+    const { error } = await RD.client.auth.updateUser({ password });
+    if (error) { busy(b, false); return msg('reset', /session/i.test(error.message) ? 'Lien expiré. Redemande un lien de réinitialisation.' : RD.frError(error), 'err'); }
+    location.replace('app.html');
+  };
+}
+</script>
+</body>
+</html>

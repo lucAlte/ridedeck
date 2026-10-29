@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Créer un compte · RideDeck</title>
+<meta name="description" content="Crée ton compte RideDeck gratuit et synchronise tes séances de home trainer sur tous tes appareils.">
+<meta name="theme-color" content="#07090c">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="site.css">
+<script src="config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="cloud.js"></script>
+<script>if (window.RD && RD.configured && RD.cachedUser()) location.replace('app.html');</script>
+</head>
+<body>
+<div class="auth">
+  <aside class="auth-side">
+    <a class="logo" href="index.html"><i></i>RIDEDECK</a>
+    <div>
+      <h2>Chaque pente,<br><em>le bon niveau.</em></h2>
+      <p>Crée ton compte en 30 secondes. Tes séances se synchronisent automatiquement entre ton PC, ton iPad et ton téléphone.</p>
+      <img class="auth-shot" src="assets/app-wide.jpg" alt="Écran de séance RideDeck" width="1600" height="670">
+    </div>
+    <div class="auth-quote">
+      <div><b>Gratuit</b>sans abonnement</div>
+      <div><b>8</b>parcours inclus</div>
+      <div><b>GPX</b>tes propres routes</div>
+    </div>
+  </aside>
+
+  <main class="auth-main">
+    <div class="auth-top">
+      <a class="logo" href="index.html"><i></i>RIDEDECK</a>
+      <a class="btn sm ghost" href="index.html">← Accueil</a>
+    </div>
+
+    <section class="auth-card" id="v-form">
+      <h1>Créer un compte</h1>
+      <p class="lead">Gratuit. Ton historique, partout.</p>
+      <div class="msg" id="m"></div>
+      <form id="f" novalidate>
+        <div class="field"><label for="s-name">Prénom</label><div class="input"><input id="s-name" type="text" autocomplete="given-name" maxlength="40" placeholder="Luc" required></div></div>
+        <div class="field"><label for="s-email">Email</label><div class="input"><input id="s-email" type="email" autocomplete="email" placeholder="toi@exemple.fr" required></div></div>
+        <div class="field">
+          <label for="s-pass">Mot de passe</label>
+          <div class="input"><input id="s-pass" type="password" autocomplete="new-password" minlength="8" placeholder="8 caractères minimum" required><button type="button" class="eye" data-eye="s-pass">Afficher</button></div>
+          <div class="meter" id="meter"><i></i><i></i><i></i><i></i></div>
+          <span class="hint" id="meter-t">8 caractères minimum, mélange lettres et chiffres.</span>
+        </div>
+        <label class="check"><input type="checkbox" id="s-ok"><span>J'accepte que mes données d'entraînement (dont la fréquence cardiaque) soient stockées sur mon compte pour être synchronisées entre mes appareils.</span></label>
+        <button class="btn primary lg form-btn" type="submit" id="b">Créer mon compte <span class="arr">→</span></button>
+      </form>
+      <p class="alt">Déjà un compte ? <a href="login.html">Se connecter</a></p>
+    </section>
+
+    <section class="auth-card sent" id="v-sent" hidden>
+      <div class="ic">✉</div>
+      <h1>Vérifie ta boîte mail</h1>
+      <p>Un lien de confirmation a été envoyé à <b id="sent-to"></b>.<br>Clique dessus pour activer ton compte, puis connecte-toi.</p>
+      <a class="btn primary lg form-btn" href="login.html">Aller à la connexion <span class="arr">→</span></a>
+      <p class="alt">Rien reçu après 2 minutes ? Regarde dans tes spams.</p>
+    </section>
+  </main>
+</div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+function msg(text, kind) { const el = $('#m'); el.textContent = text; el.className = 'msg show ' + kind; }
+document.querySelectorAll('[data-eye]').forEach(b => b.onclick = () => { const i = document.getElementById(b.dataset.eye); i.type = i.type === 'password' ? 'text' : 'password'; b.textContent = i.type === 'password' ? 'Afficher' : 'Masquer'; });
+function strength(p) { let s = 0; if (p.length >= 8) s++; if (p.length >= 12) s++; if (/[a-z]/i.test(p) && /\d/.test(p)) s++; if (/[^a-z0-9]/i.test(p) || (/[a-z]/.test(p) && /[A-Z]/.test(p))) s++; return p.length < 8 ? Math.min(s, 1) : s; }
+const COLORS = ['#ff5c6c', '#ff9e37', '#ffd23c', '#3ddc84'], LABELS = ['Trop court', 'Faible', 'Correct', 'Solide'];
+$('#s-pass').addEventListener('input', e => {
+  const p = e.target.value, s = strength(p);
+  document.querySelectorAll('#meter i').forEach((i, k) => i.style.background = p && k < Math.max(1, s) ? COLORS[Math.max(0, s - 1)] : '');
+  $('#meter-t').textContent = p ? (p.length < 8 ? 'Trop court : 8 caractères minimum.' : 'Robustesse : ' + LABELS[Math.max(0, s - 1)]) : '8 caractères minimum, mélange lettres et chiffres.';
+});
+const okEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+
+if (!RD.configured || !RD.client) {
+  msg('Les comptes ne sont pas encore activés sur ce site (config.js vide). Tu peux utiliser RideDeck en mode local, sur cet appareil uniquement.', 'info');
+  $('#f').innerHTML = '<a class="btn primary lg form-btn" href="app.html">Ouvrir RideDeck en mode local <span class="arr">→</span></a>';
+} else {
+  $('#f').onsubmit = async e => {
+    e.preventDefault();
+    const name = $('#s-name').value.trim(), email = $('#s-email').value.trim(), password = $('#s-pass').value;
+    if (!name) return msg('Indique ton prénom.', 'err');
+    if (!okEmail(email)) return msg('Adresse email invalide.', 'err');
+    if (password.length < 8) return msg('Mot de passe trop court : 8 caractères minimum.', 'err');
+    if (!$('#s-ok').checked) return msg('Coche la case pour autoriser la sauvegarde de tes données sur ton compte.', 'err');
+    const b = $('#b'); b.disabled = true; b.innerHTML = '<span class="spin"></span>Création…';
+    const { data, error } = await RD.client.auth.signUp({ email, password, options: { data: { name }, emailRedirectTo: RD.url('login.html?confirmed=1') } });
+    if (error) { b.disabled = false; b.innerHTML = 'Créer mon compte <span class="arr">→</span>'; return msg(RD.frError(error), 'err'); }
+    if (data && data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      b.disabled = false; b.innerHTML = 'Créer mon compte <span class="arr">→</span>'; return msg('Un compte existe déjà avec cet email. Connecte-toi.', 'err');
+    }
+    if (data && data.session) { location.replace('app.html'); return; }
+    $('#sent-to').textContent = email; $('#v-form').hidden = true; $('#v-sent').hidden = false;
+  };
+}
+</script>
+</body>
+</html>
